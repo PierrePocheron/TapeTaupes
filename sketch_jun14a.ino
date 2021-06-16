@@ -5,7 +5,8 @@ int partieTime = 60;
 
 const int size = 9;
 
-const int sizeCircle = 5;
+const int sizeCircle = 6;
+const int sizePlayerCircle = sizeCircle + 2;
 
 int circleCenterX = (gb.display.width()/2) - (sizeCircle / 2);
 int circleCenterY = (gb.display.height()/2) - (sizeCircle / 2);
@@ -24,27 +25,31 @@ Point tabHole[size] = {{circleCenterX - 20, circleCenterY - 20}, {circleCenterX,
 class Personnage
 {
     private:
-        // Personnage - Taille
-        int personnageSizeX = 2;
-        int personnageSizeY = 2;
-
-
         // Personnage - Position
-        int personnagePosition = 5;
+        int personnagePosition;
 
         // Personnage - Score
         int personnageScore = 0;
 
     public:
         Personnage() {
+            personnagePosition = 5;
 
+            personnageScore = 0;
         };
 
         void update() {
-          // Affichage Graphique - Le Personnage
+        // Affichage Graphique - Le Personnage
         //   gb.display.setColor(BLUE);
         //   gb.display.fillRect(personnagePositionX, personnagePositionY, personnageSizeX, personnageSizeY);
 
+        }
+
+        void render() {
+            gb.display.setColor(RED);
+            Point holeCurrent = tabHole[personnagePosition];
+            gb.display.drawCircle((holeCurrent.posX + (sizeCircle / 2)) - (sizePlayerCircle / 2), (holeCurrent.posY + (sizeCircle / 2)) - (sizePlayerCircle / 2), sizePlayerCircle);
+            
         }
 
         void move(Button action) {
@@ -103,6 +108,9 @@ class Taupe {
 
         void render() {
             //Partie graphique
+            gb.display.setColor(BLUE);
+            Point holeCurrent = tabHole[2];
+            gb.display.fillCircle((holeCurrent.posX + (sizeCircle / 2)) - (4 / 2), (holeCurrent.posY + (sizeCircle / 2)) - (4 / 2), 4);
         }
 
         bool isOut() {
@@ -142,7 +150,12 @@ class Controller {
                         delete taupeCurrent;
                     }
                 }
-            } 
+            }
+
+            if (gb.buttons.pressed(BUTTON_UP)){ personnage.move(BUTTON_UP); }  
+            if (gb.buttons.pressed(BUTTON_DOWN)) { personnage.move(BUTTON_DOWN); } 
+            if (gb.buttons.pressed(BUTTON_LEFT)) { personnage.move(BUTTON_LEFT); } 
+            if (gb.buttons.pressed(BUTTON_RIGHT)) { personnage.move(BUTTON_RIGHT); } 
         }
 
         //Faire le render après l'update
@@ -159,7 +172,9 @@ class Controller {
                     //Il y a bien une taupe présente dans le trou
                     taupeCurrent->render();
                 }
-            } 
+            }
+            
+            personnage.render();
         }
 
         void spawnMole() {
