@@ -47,8 +47,9 @@ class Personnage
 
         void render() {
             gb.display.setColor(RED);
-            Point holeCurrent = tabHole[personnagePosition];
-            gb.display.drawCircle((holeCurrent.posX + (sizeCircle / 2)) - (sizePlayerCircle / 2), (holeCurrent.posY + (sizeCircle / 2)) - (sizePlayerCircle / 2), sizePlayerCircle);
+            Point holeCurrent = tabHole[personnagePosition - 1];
+
+            gb.display.drawCircle((holeCurrent.posX + (sizeCircle / 2)) - (sizePlayerCircle / 2) + 1, (holeCurrent.posY + (sizeCircle / 2)) - (sizePlayerCircle / 2) + 1, sizePlayerCircle);
             
         }
 
@@ -56,28 +57,30 @@ class Personnage
             if(action == BUTTON_UP) {
                 if(personnagePosition > 3)
                 {
-                    personnagePosition - 3;
+                    personnagePosition -= 3;
                 }
             }
             if(action == BUTTON_DOWN) {
                 if(personnagePosition < 7)
                 {
-                    personnagePosition + 3;
+                    personnagePosition += 3;
                 }
             }
             if(action == BUTTON_LEFT) {
-                if(personnagePosition > 1)
+                if(personnagePosition > 1 && personnagePosition != 4 && personnagePosition != 7)
                 {
-                    personnagePosition - 1;
+                    personnagePosition -= 1;
                 }
             }
             if(action == BUTTON_RIGHT) {
-                if(personnagePosition < 9)
+                if(personnagePosition < 9 && personnagePosition != 3 && personnagePosition != 6)
                 {
-                    personnagePosition - 1;
+                    personnagePosition += 1;
                 }
             }
         }
+
+        
 };
 
 
@@ -89,13 +92,15 @@ class Taupe {
         int taupeSizeY = 2;
         ulong spawnTime;
         int time;
+        int positionMole;
     public:
-        Taupe() {
+        Taupe(int _positionMole) {
             spawnTime = millis();
             //5% de chance d'être en or
             isGold = (random(100) + 1) >= 95;
             //Durée de vie de la taupe sur le plateau
             time = 2;
+            positionMole = _positionMole;
         };
         
         void update() {
@@ -108,8 +113,12 @@ class Taupe {
 
         void render() {
             //Partie graphique
-            gb.display.setColor(BLUE);
-            Point holeCurrent = tabHole[2];
+            if(isGold) {
+                gb.display.setColor(YELLOW);
+            } else {
+                gb.display.setColor(BLUE);
+            }
+            Point holeCurrent = tabHole[positionMole];
             gb.display.fillCircle((holeCurrent.posX + (sizeCircle / 2)) - (4 / 2), (holeCurrent.posY + (sizeCircle / 2)) - (4 / 2), 4);
         }
 
@@ -124,6 +133,7 @@ class Controller {
         Personnage personnage;
         ulong tickTime;
         int spawningTime = 2;
+        int score = 0;
     public:
         Controller() {
             tickTime = millis();
@@ -173,6 +183,9 @@ class Controller {
                     taupeCurrent->render();
                 }
             }
+
+            gb.display.setColor(YELLOW);
+            gb.display.print(score);
             
             personnage.render();
         }
@@ -185,7 +198,7 @@ class Controller {
                 positionMole = random(10);
                 if(taupeInGame[positionMole] == nullptr) {
                     //aucune taupe a cet endroit
-                    taupeInGame[positionMole] = new Taupe();
+                    taupeInGame[positionMole] = new Taupe(positionMole);
                     isGood = true;
                 }
             } while(!isGood);
